@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CTF Writeups by Omar Yasser - Detailed walkthroughs and methodologies">
+    <title>CTF Writeups | Omar Yasser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #111111;
+            --card-bg: #1a1a1a;
+            --neon-green: #00ff7b;
+            --electric-purple: #9b59ff;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-mono);
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Navigation - reused from main page */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--neon-green);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .mobile-menu {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 2rem 2rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        /* CTF Writeup Cards */
+        .ctf-grid {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .ctf-writeup {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .ctf-writeup:hover {
+            border-color: var(--neon-green);
+            box-shadow: 0 5px 20px rgba(0, 255, 123, 0.2);
+        }
+
+        .writeup-header {
+            background: linear-gradient(135deg, var(--neon-green), var(--electric-purple));
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .writeup-header h3 {
+            font-size: 1.5rem;
+            color: var(--primary-bg);
+            margin-bottom: 0.5rem;
+        }
+
+        .writeup-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .difficulty {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .difficulty.easy { background: #28a745; color: white; }
+        .difficulty.medium { background: #ffc107; color: black; }
+        .difficulty.hard { background: #dc3545; color: white; }
+        .difficulty.insane { background: #6f42c1; color: white; }
+
+        .category-tag {
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .points {
+            margin-left: auto;
+            font-weight: 500;
+            color: var(--primary-bg);
+        }
+
+        .writeup-content {
+            padding: 2rem;
+        }
+
+        .writeup-summary {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .methodology {
+            margin-bottom: 2rem;
+        }
+
+        .methodology h4 {
+            color: var(--electric-purple);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .step {
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 2px solid var(--neon-green);
+        }
+
+        .step-number {
+            color: var(--neon-green);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-block {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: var(--font-mono);
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            color: var(--neon-green);
+        }
+
+        .command {
+            color: var(--electric-purple);
+        }
+
+        .output {
+            color: var(--text-secondary);
+            margin-left: 1rem;
+        }
+
+        .mitigation {
+            background: var(--secondary-bg);
+            border: 1px solid var(--electric-purple);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .mitigation h4 {
+            color: var(--electric-purple);
+            margin-bottom: 1rem;
+        }
+
+        .flag {
+            background: var(--secondary-bg);
+            border: 2px solid var(--neon-green);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            font-family: var(--font-mono);
+            color: var(--neon-green);
+            font-weight: 700;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            color: var(--neon-green);
+            font-weight: 700;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--secondary-bg);
+                flex-direction: column;
+                padding: 1rem;
+                border-top: 1px solid var(--border-color);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .writeup-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .points {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">OMAR_YASSER.exe</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#projects">Projects</a></li>
+                <li><a href="ctfs.html" class="active">CTFs</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="talks.html">Talks</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <button class="mobile-menu" id="mobileMenu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">CTF WRITEUPS</h1>
+            <p class="page-subtitle">Detailed walkthroughs and methodologies from competitive hacking</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">47</div>
+                <div class="stat-label">Challenges Solved</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div class="stat-label">CTFs Participated</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">TOP 50</div>
+                <div class="stat-label">Global Ranking</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">8,450</div>
+                <div class="stat-label">Total Points</div>
+            </div>
+        </div>
+
+        <div class="ctf-grid">
+            <!-- Web Exploitation Challenge -->
+            <div class="ctf-writeup">
+                <div class="writeup-header">
+                    <h3>SQL Injection Master</h3>
+                    <div class="writeup-meta">
+                        <span class="difficulty medium">Medium</span>
+                        <span class="category-tag">Web Exploitation</span>
+                        <span class="points">500 pts</span>
+                    </div>
+                </div>
+                <div class="writeup-content">
+                    <p class="writeup-summary">
+                        A classic SQL injection challenge with multiple layers of protection including WAF filtering and prepared statement bypasses. This writeup demonstrates advanced union-based extraction techniques.
+                    </p>
+                    
+                    <div class="methodology">
+                        <h4><i class="fas fa-route"></i> Methodology</h4>
+                        
+                        <div class="step">
+                            <div class="step-number">Step 1: Reconnaissance</div>
+                            <p>Initial enumeration revealed a login form with potential SQL injection points.</p>
+                            <div class="code-block">
+                                <pre><span class="command">$ curl -X POST http://target.com/login \</span>
+  <span class="command">-d "username=admin&password=test'"</span>
+<span class="output">Error: SQL syntax error near 'admin' at line 1</span></pre>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">Step 2: WAF Bypass</div>
+                            <p>The application employed keyword filtering. Used comment-based bypass techniques.</p>
+                            <div class="code-block">
+                                <pre><span class="command">payload = "admin'/**/UNION/**/SELECT/**/1,2,3--"</span>
+<span class="output">Successful bypass - 3 columns detected</span></pre>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">Step 3: Information Extraction</div>
+                            <p>Extracted database schema and located the admin credentials table.</p>
+                            <div class="code-block">
+                                <pre><span class="command">$ python sqli_extract.py -t http://target.com/login \</span>
+  <span class="command">--dump-tables --threads 10</span>
+<span class="output">Found table: admin_users</span>
+<span class="output">Found table: session_tokens</span>
+<span class="output">Found table: audit_logs</span></pre>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">Step 4: Privilege Escalation</div>
+                            <p>Used UNION SELECT to extract admin hash and cracked it offline.</p>
+                            <div class="code-block">
+                                <pre><span class="command">extracted_hash: 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8</span>
+<span class="command">$ hashcat -a 0 -m 0 hash.txt rockyou.txt</span>
+<span class="output">Cracked: password123</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flag">
+                        <i class="fas fa-flag"></i> FLAG: CTF{sql_1nj3ct10n_m4st3r_2024}
+                    </div>
+
+                    <div class="mitigation">
+                        <h4><i class="fas fa-shield-alt"></i> Mitigation Strategies</h4>
+                        <ul>
+                            <li>Implement parameterized queries/prepared statements</li>
+                            <li>Use proper input validation and sanitization</li>
+                            <li>Apply principle of least privilege for database accounts</li>
+                            <li>Deploy application-layer firewalls with strict SQL injection rules</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reverse Engineering Challenge -->
+            <div class="ctf-writeup">
+                <div class="writeup-header">
+                    <h3>Binary Secrets</h3>
+                    <div class="writeup-meta">
+                        <span class="difficulty hard">Hard</span>
+                        <span class="category-tag">Reverse Engineering</span>
+                        <span class="points">750 pts</span>
+                    </div>
+                </div>
+                <div class="writeup-content">
+                    <p class="writeup-summary">
+                        Advanced reverse engineering challenge involving anti-debugging techniques, packed executables, and custom encryption algorithms. Required dynamic analysis and cryptographic understanding.
+                    </p>
+                    
+                    <div class="methodology">
+                        <h4><i class="fas fa-cogs"></i> Analysis Workflow</h4>
+                        
+                        <div class="step">
+                            <div class="step-number">Step 1: Static Analysis</div>
+                            <p>Initial examination revealed a packed binary with anti-debugging measures.</p>
+                            <div class="code-block">
+                                <pre><span class="command">$ file challenge.exe</span>
+<span class="output">PE32 executable, UPX packed</span>
+<span class="command">$ strings challenge.exe | grep -i flag</span>
+<span class="output">No obvious strings found</span></pre>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">Step 2: Unpacking</div>
+                            <p>Used manual unpacking techniques after UPX failed due to modifications.</p>
+                            <div class="code-block">
+                                <pre><span class="command"># Set breakpoint at OEP in x64dbg</span>
+<span class="command">bp 0x401000</span>
+<span class="output">Breakpoint set successfully</span>
+<span class="command"># Dump unpacked code section</span>
+<span class="output">Successfully extracted unpacked binary</span></pre>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">Step 3: Algorithm Reverse Engineering</div>
+                            <p>Discovered custom XOR encryption with rotating key mechanism.</p>
+                            <div class="code-block">
+                                <pre><span class="command">def decrypt_flag(encrypted_data, key_base):</span>
+    <span class="command">    result = ""</span>
+    <span class="command">    for i, byte in enumerate(encrypted_data):</span>
+    <span class="command">        key = (key_base + i * 7) % 256</span>
+    <span class="command">        result += chr(byte ^ key)</span>
+    <span class="command">    return result</span></pre>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="step-number">Step 4: Key Recovery</div>
+                            <p>Used known plaintext attack to recover the base key value.</p>
+                            <div class="code-block">
+                                <pre><span class="command">$ python3 key_recovery.py</span>
+<span class="output">Testing key_base values...</span>
+<span class="output">Found valid key_base: 0x42</span>
+<span class="output">Decrypted flag: CTF{r3v3rs3_3ng1n33r1ng_n1nj4}</span></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flag">
+                        <i class="fas fa-flag"></i> FLAG: CTF{r3v3rs3_3ng1n33r1ng_n1nj4}
+                    </div>
+
+                    <div class="mitigation">
+                        <h4><i class="fas fa-lock"></i> Security Insights</h4>
+                        <ul>
+                            <li>Custom encryption algorithms are often weaker than established standards</li>
+                            <li>Obfuscation techniques delay but don't prevent determined analysis</li>
+                            <li>Known plaintext attacks are effective against weak encryption schemes</li>
+                            <li>Use proven cryptographic libraries instead of rolling your own</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenu = document.getElementById('mobileMenu');
+        const navLinks = document.getElementById('navLinks');
+
+        mobileMenu.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px var(--neon-green);
+        }
+
+        .page
